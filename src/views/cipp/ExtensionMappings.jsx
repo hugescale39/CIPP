@@ -226,9 +226,7 @@ export default function ExtensionMappings({ type, fieldMappings = false, autoMap
                               name: tenant.displayName,
                               value: tenant.customerId,
                             }))}
-                            onChange={(e) => {
-                              setMappingArray(e.value)
-                            }}
+                            onChange={(e) => setTenantMappingsArray(e.value)}
                             isLoading={listMappingBackendResult.isFetching}
                           />
                         </CCol>
@@ -238,16 +236,10 @@ export default function ExtensionMappings({ type, fieldMappings = false, autoMap
                         <CCol xs="5">
                           <RFFSelectSearch
                             name="companyId"
-                            values={listMappingBackendResult.data?.Companies.filter((client) => {
-                              return !Object.values(listMappingBackendResult.data?.Mappings)
-                                .map((value) => {
-                                  return value.value
-                                })
-                                .includes(client.value.toString())
-                            }).map((client) => ({
+                            values={listMappingBackendResult.data?.Companies.map((client) => ({
                               name: client.name,
                               value: client.value,
-                            }))}
+                            })).sort((a, b) => a.name.localeCompare(b.name))}
                             onChange={(e) => setMappingValue(e)}
                             placeholder={`Select a ${type} Organization`}
                             isLoading={listMappingBackendResult.isFetching}
@@ -259,15 +251,13 @@ export default function ExtensionMappings({ type, fieldMappings = false, autoMap
                             if (
                               mappingValue.value !== undefined &&
                               mappingValue.value !== '-1' &&
-                              Object.values(mappingArray)
-                                .map((item) => item.companyId)
-                                .includes(mappingValue.value) === false
+                              Object.values(mappingArray).map((item) => item.companyId)
                             ) {
                               setMappingArray([
                                 ...mappingArray,
                                 {
                                   Tenant: listMappingBackendResult.data?.Tenants.find(
-                                    (tenant) => tenant.customerId === mappingArray,
+                                    (tenant) => tenant.customerId === tenantMappingArray,
                                   ),
                                   companyName: mappingValue.label,
                                   companyId: mappingValue.value,
